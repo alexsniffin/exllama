@@ -1,24 +1,12 @@
 version: "3.9"
-name: exllama
+name: exllama-api
 services:
-  web:
-    build:
-      context: .
-      args:
-        - RUN_UID=$RUN_UID
-        - APPLICATION_STATE_PATH=$APPLICATION_STATE_PATH
-    command: |
-      --host 0.0.0.0:$PORT
-    env_file:
-      - .env
+  api:
+    image: exllama-api
     volumes:
-      - $MODEL_PATH:$APPLICATION_STATE_PATH/model
-      - $SESSIONS_PATH:$APPLICATION_STATE_PATH/exllama_sessions
+      - D:/models:/data/model
     ports:
-      - "$PORT:$PORT"
-    tmpfs:
-      - /tmp
-    stdin_open: true
+      - "8080:8080"
     tty: true
     deploy:
       resources:

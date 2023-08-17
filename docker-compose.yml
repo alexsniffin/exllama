@@ -5,6 +5,7 @@ services:
     image: exllama-api
     volumes:
       - D:/models:/data/model
+      - D:/exllama:/app
     ports:
       - "8080:8080"
     tty: true

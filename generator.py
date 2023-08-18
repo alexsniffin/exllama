@@ -298,7 +298,7 @@ class ExLlamaGenerator:
 
     # Simple generator function
 
-    def generate_simple(self, prompt, max_new_tokens=128, stop_tokens=None):
+    def generate_simple(self, prompt, max_new_tokens=128, stop_words=None):
         self.end_beam_search()
 
         ids, mask = self.tokenizer.encode(prompt, return_mask=True, max_seq_len=self.model.config.max_seq_len)
@@ -307,15 +307,14 @@ class ExLlamaGenerator:
         max_new_tokens = min(max_new_tokens, self.model.config.max_seq_len - ids.shape[1])
 
         stop_token_sequences = []
-        if stop_tokens:
-            for token in stop_tokens:
+        if stop_words:
+            for token in stop_words:
                 encoded = self.tokenizer.encode(token)
                 stop_token_sequences.append(encoded)
 
         generated_tokens = []
         eos = torch.zeros((ids.shape[0],), dtype=torch.bool)
         stop_detected = False
-
         for _ in range(max_new_tokens):
             token = self.gen_single_token(mask=mask)
 
@@ -338,7 +337,7 @@ class ExLlamaGenerator:
 
         text = self.tokenizer.decode(torch.tensor(generated_tokens))
 
-        for stop_token in stop_tokens:
+        for stop_token in stop_words:
             if stop_token in text:
                 text = text.split(stop_token)[0]
 

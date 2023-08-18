@@ -66,7 +66,7 @@ def completions_simple():
         generator.settings.top_k = 40
         generator.settings.typical = 0.0
 
-        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_tokens=["user:", "[INST]", "[/INST]", "<s>", "</s>", "<<SYS>>", "<</SYS>>", "[/", ". >", ". <", "</"])
+        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_words=["user:", "[INST]", "[/INST]", "<s>", "</s>", "<<SYS>>", "<</SYS>>", "[/", ". >", ". <", "</"])
         print(output_content)
 
         messages.append({

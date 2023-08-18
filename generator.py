@@ -306,14 +306,11 @@ class ExLlamaGenerator:
 
         max_new_tokens = min(max_new_tokens, self.model.config.max_seq_len - ids.shape[1])
 
-        # Encode the stop tokens into sequences of token IDs
         stop_token_sequences = []
         if stop_tokens:
             for token in stop_tokens:
                 encoded = self.tokenizer.encode(token)
                 stop_token_sequences.append(encoded)
-
-        print(f"Stop token sequences: {stop_token_sequences}")
 
         generated_tokens = []
         eos = torch.zeros((ids.shape[0],), dtype=torch.bool)
@@ -322,21 +319,14 @@ class ExLlamaGenerator:
         for _ in range(max_new_tokens):
             token = self.gen_single_token(mask=mask)
 
-            print(f"Token shape: {token.shape}")
-            print(f"Token values: {token}")
-
-            # Add the token to the generated tokens list
             generated_tokens.append(token[0, 0].item())
 
-            # Check for the presence of stop sequences in the generated tokens
-            for stop_sequence in stop_token_sequences:
-                for i in range(len(generated_tokens) - len(stop_sequence) + 1):
-                    if generated_tokens[i:i + len(stop_sequence)] == stop_sequence:
-                        print(f"Detected stop sequence: {stop_sequence}")
-                        stop_detected = True
-                        generated_tokens = generated_tokens[:i]  # Remove the stop sequence and everything after it
-                        break
-                if stop_detected:
+            for stop_sequence_tensor in stop_token_sequences:
+                stop_sequence = stop_sequence_tensor[0].tolist()
+                found = self.check_trailing_subarray(stop_sequence, generated_tokens)
+                if found:
+                    generated_tokens = generated_tokens[:-len(stop_sequence)]
+                    stop_detected = True
                     break
 
             for j in range(token.shape[0]):
@@ -348,15 +338,22 @@ class ExLlamaGenerator:
 
         text = self.tokenizer.decode(torch.tensor(generated_tokens))
 
-        # Check for stop sequences and trim if found
-        for stop_sequence_text in stop_tokens:
-            if stop_sequence_text in text:
-                # Find the index of the stop sequence in the decoded text
-                index = text.find(stop_sequence_text)
-                # Trim the text at the detected stop sequence
-                text = text[:index]
+        for stop_token in stop_tokens:
+            if stop_token in text:
+                text = text.split(stop_token)[0]
 
-        return text
+        return text.strip()
+
+    def check_trailing_subarray(self, subarray, main_array):
+        if len(subarray) > len(main_array):
+            return False
+
+        last_elements = main_array[-len(subarray):]
+
+        if last_elements == subarray:
+            return True
+        else:
+            return False
 
     # Apply repetition penalty with current  settings
 

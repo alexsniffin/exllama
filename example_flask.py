@@ -66,7 +66,7 @@ def completions_simple():
         generator.settings.top_k = 40
         generator.settings.typical = 0.0
 
-        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_words=["user:", "[INST]", "[/INST]", "<s>", "</s>", "<<SYS>>", "<</SYS>>", "[/", ". >", ". <", "</"])
+        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_words=["user:", "[INST]", "[/INST]", "[inst]", "[/inst]", "<s>", "</s>", "<S>", "</S>", "<<SYS>>", "<</SYS>>", "<<sys>>", "<</sys>>", "[/", ". >", ". <", "</"])
         print(output_content)
 
         messages.append({
@@ -95,8 +95,9 @@ def completions_simple():
 
 
 def generate_prompt(messages):
-    system_prompt = "You are an assistant, having a conversation with a user. You are given the history of the " \
-                    "conversation. Reply back to the user only as the assistant, provide only a single message."
+    system_prompt = "You are a chat assistant, having a conversation with a user about anything. You are given the " \
+                    "history of the conversation. Continue the conversation by replying back to the user as the " \
+                    "assistant."
 
     prompt = f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"
 

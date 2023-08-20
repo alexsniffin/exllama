@@ -42,7 +42,7 @@ def log_request():
     app.logger.info(f"Route accessed: {request.path}, Method: {request.method}")
 
 
-@app.route('/chat/completions', methods=['POST'])
+@app.route('/v1/chat/completions', methods=['POST'])
 def completions_simple():
     with request_lock:
         data = request.json
@@ -66,7 +66,7 @@ def completions_simple():
         generator.settings.top_k = 40
         generator.settings.typical = 0.0
 
-        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_words=["user:", "[INST]", "[/INST]", "[inst]", "[/inst]", "<s>", "</s>", "<S>", "</S>", "<<SYS>>", "<</SYS>>", "<<sys>>", "<</sys>>", "[/", ". >", ". <", "</"])
+        output_content = generator.generate_simple(prompt, max_new_tokens=max_tokens, stop_words=["user:", "[INST]", "[/INST]", "[inst]", "[/inst]", "<s>", "</s>", "<S>", "</S>", "<<SYS>>", "<</SYS>>", "<<sys>>", "<</sys>>", "[/", ". >", ". <", "</", "\n<", "<!"])
         print(output_content)
 
         messages.append({
